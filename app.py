@@ -10,10 +10,15 @@ import numpy as np
 import logging
 from typing import List, Tuple, Optional
 from torchvision import transforms
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect, send_from_directory, url_for
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
+
+UPLOAD_FOLDER = 'uploads/'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Command line arguments simulation (replace with actual paths)
 text_data_path = 'models/styles.csv'
@@ -49,6 +54,10 @@ def preprocess_image(image: Image.Image) -> torch.Tensor:
     return image_transforms(image)
 
 
+def allowed_file(filename: str) -> bool:
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 def download_image(url: str, save_path: str) -> Optional[Image.Image]:
     try:
         response = requests.get(url)
@@ -69,7 +78,22 @@ text_df['id'] = text_df['id'].astype(str)
 image_df['filename'] = image_df['filename'].str.replace('.jpg', '')
 
 merged_df = pd.merge(text_df, image_df, left_on='id', right_on='filename')
-product_descriptions = [preprocess_text(desc) for desc in merged_df['productDisplayName'].tolist()]
+
+# Concatenate and preprocess relevant columns to form comprehensive descriptions
+merged_df['combined'] = merged_df.apply(
+    lambda row: ' '.join([
+        str(row['gender']),
+        str(row['masterCategory']),
+        str(row['subCategory']),
+        str(row['articleType']),
+        str(row['baseColour']),
+        str(row['season']),
+        str(row['year']),
+        str(row['usage']),
+        str(row['productDisplayName'])
+    ]), axis=1)
+
+product_descriptions = [preprocess_text(desc) for desc in merged_df['combined'].tolist()]
 image_urls = merged_df['link'].tolist()
 
 logging.info(f"Loaded {len(product_descriptions)} product descriptions and {len(image_urls)} image URLs.")
@@ -174,6 +198,12 @@ def retrieve_images_by_text(text_query: str, k: int = 5) -> List[Tuple[int, floa
     return search_index(faiss_index, query_features, k)
 
 
+def retrieve_similar_uploaded_image(uploaded_img: Image.Image, k: int = 5) -> List[Tuple[int, float]]:
+    preprocessed_img = preprocess_image(uploaded_img)
+    query_image_features = extract_image_features([preprocessed_img], batch_size)
+    return search_index(faiss_index, query_image_features, k)
+
+
 # Routes
 @app.route('/')
 def homepage():
@@ -185,25 +215,56 @@ def search_by_text():
     query_text = request.form['query_text']
     similar_products_by_text = retrieve_similar_texts(query_text)
     similar_images_by_text = retrieve_images_by_text(query_text)
-    indices = [idx for idx, _ in similar_images_by_text]  # Indices for similar images
+    indices_and_scores = [(idx, score) for (idx, score) in
+                          similar_images_by_text]  # Indices and scores for similar images
     return render_template('search_results.html',
                            text_query=query_text,
                            similar_products_by_text=[product_descriptions[idx] for idx, _ in similar_products_by_text],
                            image_urls=image_urls,  # Pass image URLs list
-                           indices=indices)
+                           indices_and_scores=indices_and_scores)  # Pass indices and scores
 
 
 @app.route('/search_by_image', methods=['POST'])
 def search_by_image():
     query_image_url = request.form['query_image_url']
     similar_products_by_image = retrieve_similar_images(query_image_url)
-    indices = [idx for idx, _ in similar_products_by_image]  # Indices for similar images
+    indices_and_scores = [(idx, score) for (idx, score) in
+                          similar_products_by_image]  # Indices and scores for similar images
     return render_template('search_results.html',
                            image_url=query_image_url,
                            image_urls=image_urls,  # Pass image URLs list
-                           indices=indices)
+                           indices_and_scores=indices_and_scores)  # Pass indices and scores
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
+@app.route('/search_by_image_upload', methods=['POST'])
+def search_by_image_upload():
+    if 'query_image_file' not in request.files:
+        return redirect(request.url)
+
+    file = request.files['query_image_file']
+    if file.filename == '':
+        return redirect(request.url)
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        uploaded_img = Image.open(filepath).convert('RGB')
+        similar_images_by_upload = retrieve_similar_uploaded_image(uploaded_img)
+        indices_and_scores = [(idx, score) for (idx, score) in similar_images_by_upload]
+
+        return render_template('search_results.html',
+                               image_file_url=url_for('uploaded_file', filename=filename),
+                               image_urls=image_urls,
+                               indices_and_scores=indices_and_scores)
 
 
 if __name__ == '__main__':
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
     app.run(debug=True)
-

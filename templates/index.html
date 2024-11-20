@@ -22,5 +22,13 @@
             </div>
             <button type="submit" class="btn btn-primary">Search</button>
         </form>
+
+        <form action="/search_by_image_upload" method="post" enctype="multipart/form-data" class="mb-4">
+            <div class="form-group">
+                <label for="query_image_file">Upload Image to Search:</label>
+                <input type="file" id="query_image_file" name="query_image_file" class="form-control-file">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
     </div>
 {% endblock %}
