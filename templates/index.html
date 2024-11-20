@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Image and Text Search
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h2 class="my-4">Search</h2>
+        <form action="/search_by_text" method="post" class="mb-4">
+            <div class="form-group">
+                <label for="query_text">Search by Text:</label>
+                <input type="text" id="query_text" name="query_text" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        <form action="/search_by_image" method="post" class="mb-4">
+            <div class="form-group">
+                <label for="query_image_url">Search by Image URL:</label>
+                <input type="text" id="query_image_url" name="query_image_url" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+{% endblock %}
