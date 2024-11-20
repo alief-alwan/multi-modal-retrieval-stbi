@@ -1,43 +1,54 @@
 {% extends "base.html" %}
 
-{% block title %}
-Search Results
-{% endblock %}
+{% block title %}Search Results{% endblock %}
 
 {% block content %}
-    <h2>Search Results</h2>
+<div class="container">
+    <h2 class="my-4 text-center">Search Results</h2>
 
     {% if text_query %}
-    <p><strong>Text Query:</strong> {{ text_query }}</p>
-    <h3>Similar Products by Text:</h3>
-    <ul class="list-group mb-4">
-        {% for product in similar_products_by_text %}
-        <li class="list-group-item">{{ product }}</li>
-        {% endfor %}
-    </ul>
+        <div class="text-query mb-4">
+            <p class="lead"><strong>Text Query:</strong> {{ text_query }}</p>
+            <h3 class="my-3">Similar Products by Text:</h3>
+            <ul class="list-group mb-4">
+                {% for product in similar_products_by_text %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ product }}
+                        <span class="badge bg-primary rounded-pill">Text</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
     {% endif %}
 
-    {% if image_url %}
-    <p><strong>Image Query URL:</strong></p>
-    <img src="{{ image_url }}" alt="Query Image" class="img-thumbnail mb-4">
-    {% endif %}
+    <div class="query-images mb-4 text-center">
+        {% if image_url %}
+            <div class="mb-4">
+                <p><strong>Image Query URL:</strong></p>
+                <img src="{{ image_url }}" alt="Query Image" class="img-thumbnail" width=400" height="500">
+            </div>
+        {% endif %}
 
-    {% if image_file_url %}
-    <p><strong>Uploaded Image:</strong></p>
-    <img src="{{ image_file_url }}" alt="Query Uploaded Image" class="img-thumbnail mb-4">
-    {% endif %}
+        {% if image_file_url %}
+            <div class="mb-4">
+                <p><strong>Uploaded Image:</strong></p>
+                <img src="{{ image_file_url }}" alt="Uploaded Image" class="img-thumbnail" width=400" height="500">
+            </div>
+        {% endif %}
+    </div>
 
-    <h3>Similar Images:</h3>
-    <div class="row">
+    <h3 class="my-4">Similar Images:</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for idx, score in indices_and_scores %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <img src="{{ image_urls[idx] }}" class="card-img-top" alt="Similar Image">
-                <div class="card-body">
-                    <p class="card-text"><strong>Similarity Score:</strong> {{ score }}</p>
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="{{ image_urls[idx] }}" class="card-img-top" alt="Similar Image">
+                    <div class="card-body">
+                        <p class="card-text"><strong>Similarity Score:</strong> {{ score }}</p>
+                    </div>
                 </div>
             </div>
-        </div>
         {% endfor %}
     </div>
+</div>
 {% endblock %}

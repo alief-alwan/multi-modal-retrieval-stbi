@@ -1,27 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Multi-Modal Image Retrieval System{% endblock %}</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        footer {
-            margin-top: 20px;
-            border-top: 1px solid #ccc;
-            padding-top: 10px;
-            text-align: center;
-        }
-    </style>
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <header class="my-4">
-            <h1 class="mt-4">Image and Text Search</h1>
-            <nav class="mb-4">
-                <a href="/" class="btn btn-primary">Home</a>
+        <header class="header my-4">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <a class="navbar-brand" href="/">Multi-Modal Image Retrieval</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="/">Home</a>
+                        </li>
+                    </ul>
+                </div>
             </nav>
         </header>
 
@@ -29,13 +31,13 @@
             {% block content %}{% endblock %}
         </main>
 
-        <footer class="mt-4">
-            <p>© 2023 Image and Text Search Application</p>
+        <footer class="footer mt-4">
+            <p class="mb-0">Tugas Akhir Sistem Temu Balik Informasi</p>
         </footer>
     </div>
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.amazonaws.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

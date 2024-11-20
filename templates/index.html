@@ -1,34 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}
-    Image and Text Search
-{% endblock %}
+{% block title %}Multi-Modal Image Retrieval System{% endblock %}
 
 {% block content %}
-    <div class="container">
-        <h2 class="my-4">Search</h2>
-        <form action="/search_by_text" method="post" class="mb-4">
-            <div class="form-group">
-                <label for="query_text">Search by Text:</label>
-                <input type="text" id="query_text" name="query_text" class="form-control">
+<div class="container">
+    <h2 class="my-4 text-center">Search</h2>
+
+    <div class="search-forms d-flex flex-column align-items-center">
+        <form action="/search_by_text" method="post" class="main-content mb-4 p-4 shadow-sm rounded bg-white" style="width: 100%; max-width: 600px;">
+            <div class="form-group mb-3">
+                <label for="query_text" class="form-label">
+                    <i class="fas fa-search"></i> Search by Text:
+                </label>
+                <input type="text" id="query_text" name="query_text" class="form-control" placeholder="Enter text to search">
             </div>
-            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search"></i> Search
+            </button>
         </form>
 
-        <form action="/search_by_image" method="post" class="mb-4">
-            <div class="form-group">
-                <label for="query_image_url">Search by Image URL:</label>
-                <input type="text" id="query_image_url" name="query_image_url" class="form-control">
+        <form action="/search_by_image" method="post" class="main-content mb-4 p-4 shadow-sm rounded bg-white" style="width: 100%; max-width: 600px;">
+            <div class="form-group mb-3">
+                <label for="query_image_url" class="form-label">
+                    <i class="fas fa-link"></i> Search by Image URL:
+                </label>
+                <input type="text" id="query_image_url" name="query_image_url" class="form-control" placeholder="Enter image URL to search">
             </div>
-            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search"></i> Search
+            </button>
         </form>
 
-        <form action="/search_by_image_upload" method="post" enctype="multipart/form-data" class="mb-4">
-            <div class="form-group">
-                <label for="query_image_file">Upload Image to Search:</label>
-                <input type="file" id="query_image_file" name="query_image_file" class="form-control-file">
+        <form action="/search_by_image_upload" method="post" enctype="multipart/form-data" class="main-content mb-4 p-4 shadow-sm rounded bg-white" style="width: 100%; max-width: 600px;">
+            <div class="form-group mb-3">
+                <label for="query_image_file" class="form-label">
+                    <i class="fas fa-upload"></i> Upload Image to Search:
+                </label>
+                <input type="file" id="query_image_file" name="query_image_file" class="form-control">
             </div>
-            <button type="submit" class="btn btn-primary">Search</button>
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-search"></i> Search
+            </button>
         </form>
     </div>
+</div>
 {% endblock %}
